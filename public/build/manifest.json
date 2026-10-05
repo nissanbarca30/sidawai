@@ -1,0 +1,19 @@
+{
+  "resources/css/admin-layout.css": {
+    "file": "assets/admin-layout-CkRtjZ6I.css",
+    "src": "resources/css/admin-layout.css",
+    "isEntry": true
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-l0sNRNKZ.js",
+    "name": "app",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DMsN-rLE.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}
