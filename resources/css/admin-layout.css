@@ -1,0 +1,218 @@
+        :root {
+        --sidawai-green: #40BF89;
+        --sidawai-dark: #212529;
+        --sidebar-width: 260px;
+    }
+
+    body {
+        background-color: var(--bs-body-bg);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        transition: background-color 0.3s ease;
+        overflow-x: hidden;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+        width: var(--sidebar-width);
+        min-height: 100vh;
+        background: var(--sidawai-green);
+        color: white;
+        padding-top: 0;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+        z-index: 1040;
+        transition: all 0.3s ease-in-out;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+    }
+
+    /* Wrapper Sticky Sidebar */
+    .sidebar .sidebar-wrapper {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow-y: auto;
+    }
+
+    /* Mode Gelap Sidebar */
+    [data-bs-theme="dark"] .sidebar {
+        background: #1a8a5f;
+    }
+
+    .sidebar-brand-container {
+        padding: 20px 15px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        margin-bottom: 15px;
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Perbaikan: Menjadikan Logo Gambar Putih Polos */
+    .logo-img {
+        width: 100%;
+        max-width: 150px;
+        height: auto;
+        filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+        object-fit: contain;
+    }
+
+    /* Nav Link Styling */
+    .sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 12px 20px;
+        transition: all 0.3s;
+        font-weight: 600;
+    }
+
+    .sidebar .nav-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+    }
+
+    .sidebar .nav-link.active {
+        background: var(--sidawai-dark);
+        color: white;
+        border-left: 4px solid #f1c40f;
+        margin: 0 12px;
+        border-radius: 6px;
+    }
+
+    /* Footer Sidebar (User Info & Logout) */
+    .sidebar-footer {
+        padding: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(0, 0, 0, 0.08);
+        margin-top: auto;
+    }
+
+    .user-info-box {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin-bottom: 12px;
+    }
+
+    .sidebar .nav-link.text-danger-custom {
+        background: rgba(0, 0, 0, 0.25);
+        color: #fff !important;
+        margin: 0;
+        border-radius: 8px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .sidebar .nav-link.text-danger-custom:hover {
+        background: #dc3545;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Area Konten Utama */
+    .content-wrapper {
+        margin-left: var(--sidebar-width);
+        transition: all 0.3s ease-in-out;
+        min-height: 100vh;
+    }
+
+    .content-area {
+        padding: 25px 30px;
+    }
+
+    /* Top Navbar (Hamburger Toggle Bar) */
+    .top-navbar {
+        background: var(--bs-body-bg);
+        border-bottom: 1px solid var(--bs-border-color);
+        padding: 12px 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+    }
+
+    .btn-hamburger {
+        background: transparent;
+        border: none;
+        font-size: 1.6rem;
+        color: var(--bs-body-color);
+        cursor: pointer;
+        padding: 0 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .btn-hamburger:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Tampilan Ketika Sidebar Di-Hide (Toggled) */
+    body.sidebar-toggled .sidebar {
+        margin-left: calc(-1 * var(--sidebar-width));
+    }
+
+    body.sidebar-toggled .content-wrapper {
+        margin-left: 0;
+    }
+
+    /* Backdrop Gelap untuk Mobile saat Sidebar Terbuka */
+    .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1035;
+    }
+
+    /* Responsif Layar Kecil (Mobile / Tablet < 992px) */
+    @media (max-width: 991.98px) {
+        .sidebar {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .content-wrapper {
+            margin-left: 0;
+        }
+
+        body.sidebar-mobile-open .sidebar {
+            margin-left: 0;
+        }
+
+        body.sidebar-mobile-open .sidebar-backdrop {
+            display: block;
+        }
+    }
+
+    /* Floating Toggle Theme Button */
+    .theme-toggle-admin {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: var(--sidawai-dark);
+        color: white;
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .swal2-popup.swal-themed {
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        border: 1px solid var(--bs-border-color);
+    }
+
+    .swal-themed .swal2-title,
+    .swal-themed .swal2-html-container {
+        color: var(--bs-body-color);
+    }
