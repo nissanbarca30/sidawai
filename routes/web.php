@@ -33,6 +33,9 @@ Route::get('/test-email', function () {
 
 // Dashboard User
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::put('/home/ai-preferences', [HomeController::class, 'updateAiPreferences'])
+    ->middleware('auth')
+    ->name('home.ai-preferences');
 
 // Group Route Terproteksi Auth
 Route::middleware(['auth'])->group(function () {

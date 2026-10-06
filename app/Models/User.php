@@ -25,6 +25,8 @@ class User extends Authenticatable
         'password',
         'role',
         'permissions',
+        'ai_provider',
+        'ai_model',
     ];
 
     /**
