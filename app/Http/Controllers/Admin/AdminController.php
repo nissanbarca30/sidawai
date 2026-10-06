@@ -371,7 +371,6 @@ class AdminController extends Controller
         return $query;
     }
 
-    /** Filter berdasarkan role (superadmin / admin / pegawai). */
     private function applyRoleFilter(Builder $query, Request $request): Builder
     {
         if ($request->filled('role') && in_array($request->role, self::ROLES)) {
@@ -381,7 +380,6 @@ class AdminController extends Controller
         return $query;
     }
 
-    /** Pengurutan: A-Z, Z-A, atau default hierarki role. */
     private function applySort(Builder $query, ?string $sort): Builder
     {
         return match ($sort) {
@@ -391,7 +389,6 @@ class AdminController extends Controller
         };
     }
 
-    /** Superadmin > Admin > Pegawai, lalu nama A-Z. */
     private function orderByRoleHierarchy(Builder $query): Builder
     {
         return $query
@@ -399,12 +396,6 @@ class AdminController extends Controller
             ->orderBy('name', 'asc');
     }
 
-    /**
-     * Tentukan bulan/tahun folder, tanggal, dan keterangan akhir dokumen.
-     *
-     * Rekap presensi memakai aturan potong tanggal 25:
-     * sampai tgl 25 masuk folder bulan lalu, setelahnya masuk bulan berjalan.
-     */
     private function resolvePeriode(Request $request): array
     {
         if ($request->kategori === 'rekap_presensi') {
@@ -436,7 +427,6 @@ class AdminController extends Controller
         ];
     }
 
-    /** Hapus file fisik dokumen dari disk 'local' jika ada. */
     private function deleteStoredFile(Document $document): void
     {
         if ($document->file_path && Storage::disk('local')->exists($document->file_path)) {

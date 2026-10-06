@@ -6,25 +6,9 @@ use App\Models\Document;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class HomeController extends Controller
 {
-    private const AI_PROVIDERS = [
-        'openai' => [
-            'gpt-4o' => 'GPT-4o',
-            'gpt-4o-mini' => 'GPT-4o mini',
-        ],
-        'anthropic' => [
-            'claude-3-5-sonnet-latest' => 'Claude 3.5 Sonnet',
-            'claude-3-5-haiku-latest' => 'Claude 3.5 Haiku',
-        ],
-        'google' => [
-            'gemini-2.0-flash' => 'Gemini 2.0 Flash',
-            'gemini-2.0-pro' => 'Gemini 2.0 Pro',
-        ],
-    ];
-
     /**
      * Create a new controller instance.
      *
@@ -41,6 +25,9 @@ class HomeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Support\Renderable|\Illuminate\Http\RedirectResponse
      */
+
+    
+
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -82,32 +69,6 @@ class HomeController extends Controller
             ->groupBy('bulan_periode', 'tahun_periode')
             ->get();
 
-        $selectedProvider = $user->ai_provider ?: 'openai';
-        $selectedModel = $user->ai_model ?: 'gpt-4o-mini';
-        $aiProviders = self::AI_PROVIDERS;
-
-        return view('home', compact(
-            'documents',
-            'selectedYear',
-            'availableYears',
-            'selectedProvider',
-            'selectedModel',
-            'aiProviders'
-        ));
-    }
-
-    public function updateAiPreferences(Request $request)
-    {
-        $validated = $request->validate([
-            'ai_provider' => ['required', Rule::in(array_keys(self::AI_PROVIDERS))],
-            'ai_model' => [
-                'required',
-                Rule::in(self::AI_PROVIDERS[$request->input('ai_provider')] ?? []),
-            ],
-        ]);
-
-        $request->user()->update($validated);
-
-        return redirect()->route('home')->with('status', 'Preferensi AI berhasil disimpan.');
+        return view('home', compact('documents', 'selectedYear', 'availableYears'));
     }
 }

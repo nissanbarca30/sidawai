@@ -20,7 +20,7 @@
                         class="bg-[#f0f0f0] dark:bg-[#161a1e] border-2 border-black dark:border-gray-600 text-gray-800 dark:text-white font-extrabold px-3 py-2 rounded-md focus:outline-none cursor-pointer transition-all">
                     @foreach($availableYears as $year)
                         <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>
-                            Tahun {{ $year }}
+                            {{ $year }}
                         </option>
                     @endforeach
                 </select>
@@ -45,67 +45,6 @@
             </div>
         </div>
     </div>
-
-    <section class="p-6 border-b border-gray-200 dark:border-gray-700/60">
-        <form method="POST" action="{{ route('home.ai-preferences') }}" class="space-y-4">
-            @csrf
-            @method('PUT')
-
-            <div>
-                <h2 class="text-lg font-extrabold text-gray-800 dark:text-white">Preferensi Model AI</h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Pilihan ini disimpan untuk akun Anda. Integrasi AI belum diaktifkan.
-                </p>
-            </div>
-
-            @if (session('status'))
-                <p role="status" class="text-sm font-bold text-emerald-700 dark:text-emerald-400">
-                    {{ session('status') }}
-                </p>
-            @endif
-
-            @if ($errors->any())
-                <p role="alert" class="text-sm font-bold text-red-600 dark:text-red-400">
-                    {{ $errors->first() }}
-                </p>
-            @endif
-
-            <div class="flex flex-col sm:flex-row gap-3">
-                <div class="flex-1">
-                    <label for="ai_provider" class="block mb-1 text-sm font-bold text-gray-700 dark:text-gray-200">Provider</label>
-                    <select id="ai_provider" name="ai_provider" required
-                            class="w-full px-3 py-2 rounded-md border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-[#161a1e] text-gray-800 dark:text-white">
-                        @foreach ($aiProviders as $provider => $models)
-                            <option value="{{ $provider }}" {{ $selectedProvider === $provider ? 'selected' : '' }}>
-                                {{ ucfirst($provider) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="flex-1">
-                    <label for="ai_model" class="block mb-1 text-sm font-bold text-gray-700 dark:text-gray-200">Model</label>
-                    <select id="ai_model" name="ai_model" required
-                            class="w-full px-3 py-2 rounded-md border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-[#161a1e] text-gray-800 dark:text-white">
-                        @foreach ($aiProviders as $provider => $models)
-                            @foreach ($models as $model => $label)
-                                <option value="{{ $model }}" data-provider="{{ $provider }}"
-                                        {{ $selectedModel === $model ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="sm:self-end">
-                    <button type="submit" class="w-full sm:w-auto px-4 py-2 rounded-md bg-[#40BF89] hover:bg-[#35a977] text-white font-bold transition-colors">
-                        Simpan Preferensi
-                    </button>
-                </div>
-            </div>
-        </form>
-    </section>
 
     <!-- Body Tabel (Daftar Folder Bulan) -->
     <div class="overflow-x-auto">
@@ -184,26 +123,6 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/homeblade.js') }}"></script>
-    <script>
-        const aiProviderSelect = document.getElementById('ai_provider');
-        const aiModelSelect = document.getElementById('ai_model');
-
-        function filterAiModels() {
-            const availableModels = Array.from(aiModelSelect.options)
-                .filter(option => option.dataset.provider === aiProviderSelect.value);
-
-            aiModelSelect.querySelectorAll('option').forEach(option => {
-                option.hidden = option.dataset.provider !== aiProviderSelect.value;
-            });
-
-            if (!availableModels.some(option => option.value === aiModelSelect.value)) {
-                aiModelSelect.value = availableModels[0].value;
-            }
-        }
-
-        aiProviderSelect.addEventListener('change', filterAiModels);
-        filterAiModels();
-    </script>
 @endpush
 
 @endsection
