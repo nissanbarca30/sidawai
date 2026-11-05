@@ -101,7 +101,7 @@ class DocumentController extends Controller
                         'kategori'      => $request->kategori,
                         'tanggal'       => $dbTanggal,
                         'keterangan'    => $finalKeterangan,
-                        'file_path'     => $path, // Mengacu ke path file fisik yang sama
+                        'file_path'     => $path,
                         'file_name'     => $fileName,
                         'bulan_periode' => $bulanPeriode,
                         'tahun_periode' => $tahunPeriode,
