@@ -7,6 +7,7 @@ use App\Models\Document;
 use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -253,7 +254,7 @@ class AdminController extends Controller
         return view('admin.documents.files', compact('user', 'bulan', 'documents'));
     }
 
-    public function storeDocumentForUser(Request $request, $userId)
+public function storeDocumentForUser(Request $request, $userId)
     {
         $user = User::findOrFail($userId);
 
@@ -266,29 +267,76 @@ class AdminController extends Controller
             'lampiran.*'      => 'file|mimes:pdf,jpg,jpeg,png|max:5048',
         ]);
 
-        $periode = $this->resolvePeriode($request);
+        if ($request->kategori === 'rekap_presensi') {
+            $today = Carbon::now();
+            $refDate = $today->day <= 25 ? $today->copy()->subMonth() : $today->copy();
 
-        foreach ($request->file('lampiran') as $file) {
-            $fileName = $file->getClientOriginalName();
+            $bulanPeriode = self::BULAN[$refDate->month];
+            $tahunPeriode = $refDate->year;
+            $dbTanggal = $today->format('Y-m-d');
+            $finalKeterangan = '[REKAP PRESENSI] ' . $request->keterangan;
 
-            // Simpan ke storage privat, dirapikan per tahun/bulan
-            $path = $file->storeAs(
-                "documents/{$periode['tahun']}/{$periode['bulan']}",
-                time() . '_' . $fileName,
-                'local'
-            );
+            foreach ($request->file('lampiran') as $file) {
+                $fileName = $file->getClientOriginalName();
+                $path = $file->storeAs("documents/{$tahunPeriode}/{$bulanPeriode}", time() . '_' . $fileName, 'local');
 
-            Document::create([
-                'user_id'       => $user->id,
-                'kategori'      => $request->kategori,
-                'tanggal'       => $periode['tanggal'],
-                'keterangan'    => $periode['keterangan'],
-                'file_path'     => $path,
-                'file_name'     => $fileName,
-                'bulan_periode' => $periode['bulan'],
-                'tahun_periode' => $periode['tahun'],
-                'share_token'   => Str::random(40), // Permanent shared token untuk aplikasi pusat
-            ]);
+                Document::create([
+                    'user_id'       => $user->id,
+                    'kategori'      => $request->kategori,
+                    'tanggal'       => $dbTanggal,
+                    'keterangan'    => $finalKeterangan,
+                    'file_path'     => $path,
+                    'file_name'     => $fileName,
+                    'bulan_periode' => $bulanPeriode,
+                    'tahun_periode' => $tahunPeriode,
+                    'share_token'   => Str::random(40),
+                ]);
+            }
+        } else {
+            // Data Dukung dengan penanganan Izin Lintas Bulan/Tahun
+            $startDate = Carbon::parse($request->tanggal_mulai);
+            $endDate = $request->tanggal_selesai ? Carbon::parse($request->tanggal_selesai) : $startDate->copy();
+
+            if ($request->tanggal_selesai && $request->tanggal_selesai !== $request->tanggal_mulai) {
+                $rentangTeks = "(Izin Tgl " . $startDate->format('d/m/Y') . " s/d " . $endDate->format('d/m/Y') . ") ";
+                $finalKeterangan = $rentangTeks . $request->keterangan;
+            } else {
+                $finalKeterangan = $request->keterangan;
+            }
+
+            // Ekstrak semua bulan yang dilewati rentang izin
+            $period = CarbonPeriod::create($startDate->copy()->startOfMonth(), '1 month', $endDate->copy()->startOfMonth());
+
+            foreach ($request->file('lampiran') as $file) {
+                $fileName = $file->getClientOriginalName();
+
+                // Simpan berkas fisik sekali di bulan pertama
+                $firstMonth = self::BULAN[$startDate->month];
+                $firstYear = $startDate->year;
+                $path = $file->storeAs("documents/{$firstYear}/{$firstMonth}", time() . '_' . $fileName, 'local');
+
+                // Buat record database per bulan yang terlintas
+                foreach ($period as $dt) {
+                    $bulanPeriode = self::BULAN[$dt->month];
+                    $tahunPeriode = $dt->year;
+
+                    $dbTanggal = ($dt->month === $startDate->month && $dt->year === $startDate->year)
+                        ? $startDate->format('Y-m-d')
+                        : $dt->copy()->startOfMonth()->format('Y-m-d');
+
+                    Document::create([
+                        'user_id'       => $user->id,
+                        'kategori'      => $request->kategori,
+                        'tanggal'       => $dbTanggal,
+                        'keterangan'    => $finalKeterangan,
+                        'file_path'     => $path,
+                        'file_name'     => $fileName,
+                        'bulan_periode' => $bulanPeriode,
+                        'tahun_periode' => $tahunPeriode,
+                        'share_token'   => Str::random(40),
+                    ]);
+                }
+            }
         }
 
         return back()->with('success', 'Dokumen berhasil di-upload ke folder ' . $user->name);
