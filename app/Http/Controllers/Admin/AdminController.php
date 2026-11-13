@@ -173,7 +173,6 @@ class AdminController extends Controller
             return $this->redirectToUsers('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
-        // Hanya Superadmin yang boleh menghapus akun ber-role Admin
         if ($user->role === 'admin' && !$currentUser->isSuperadmin()) {
             return $this->redirectToUsers('error', 'Hanya Superadmin yang berwenang menghapus akun Admin.');
         }
@@ -295,7 +294,7 @@ class AdminController extends Controller
         return view('admin.documents.files', compact('user', 'bulan', 'documents'));
     }
 
-public function storeDocumentForUser(Request $request, $userId)
+    public function storeDocumentForUser(Request $request, $userId)
     {
         $user = User::findOrFail($userId);
 
@@ -308,6 +307,8 @@ public function storeDocumentForUser(Request $request, $userId)
             'lampiran.*'      => 'file|mimes:pdf,jpg,jpeg,png|max:5048',
         ]);
 
+        $targetBulan = '';
+
         if ($request->kategori === 'rekap_presensi') {
             $today = Carbon::now();
             $refDate = $today->day <= 25 ? $today->copy()->subMonth() : $today->copy();
@@ -316,6 +317,7 @@ public function storeDocumentForUser(Request $request, $userId)
             $tahunPeriode = $refDate->year;
             $dbTanggal = $today->format('Y-m-d');
             $finalKeterangan = '[REKAP PRESENSI] ' . $request->keterangan;
+            $targetBulan = $bulanPeriode;
 
             foreach ($request->file('lampiran') as $file) {
                 $fileName = $file->getClientOriginalName();
@@ -334,9 +336,9 @@ public function storeDocumentForUser(Request $request, $userId)
                 ]);
             }
         } else {
-            // Data Dukung dengan penanganan Izin Lintas Bulan/Tahun
             $startDate = Carbon::parse($request->tanggal_mulai);
             $endDate = $request->tanggal_selesai ? Carbon::parse($request->tanggal_selesai) : $startDate->copy();
+            $targetBulan = self::BULAN[$startDate->month];
 
             if ($request->tanggal_selesai && $request->tanggal_selesai !== $request->tanggal_mulai) {
                 $rentangTeks = "(Izin Tgl " . $startDate->format('d/m/Y') . " s/d " . $endDate->format('d/m/Y') . ") ";
@@ -345,18 +347,14 @@ public function storeDocumentForUser(Request $request, $userId)
                 $finalKeterangan = $request->keterangan;
             }
 
-            // Ekstrak semua bulan yang dilewati rentang izin
             $period = CarbonPeriod::create($startDate->copy()->startOfMonth(), '1 month', $endDate->copy()->startOfMonth());
 
             foreach ($request->file('lampiran') as $file) {
                 $fileName = $file->getClientOriginalName();
-
-                // Simpan berkas fisik sekali di bulan pertama
                 $firstMonth = self::BULAN[$startDate->month];
                 $firstYear = $startDate->year;
                 $path = $file->storeAs("documents/{$firstYear}/{$firstMonth}", time() . '_' . $fileName, 'local');
 
-                // Buat record database per bulan yang terlintas
                 foreach ($period as $dt) {
                     $bulanPeriode = self::BULAN[$dt->month];
                     $tahunPeriode = $dt->year;
@@ -380,7 +378,11 @@ public function storeDocumentForUser(Request $request, $userId)
             }
         }
 
-        return back()->with('success', 'Dokumen berhasil di-upload ke folder ' . $user->name);
+        // Langsung arahkan ke folder bulan tujuan sesuai hasil perhitungan periode
+        return redirect()->route('admin.documents.files', [
+            'userId' => $user->id,
+            'bulan'  => $targetBulan,
+        ])->with('success', "Dokumen berhasil di-upload dan masuk ke folder bulan {$targetBulan}!");
     }
 
     public function previewFile($id)

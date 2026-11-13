@@ -3,6 +3,16 @@
 @section('header', 'Folder Dokumen Pegawai')
 
 @section('content')
+<!-- Overlay Layar Penuh saat Drag File ke Browser -->
+<div id="globalDropOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none justify-content-center align-items-center" 
+     style="background: rgba(64, 191, 137, 0.92); z-index: 9999; backdrop-filter: blur(4px);">
+    <div class="text-center text-white p-5 border border-3 border-white border-dashed rounded-4">
+        <i class="bi bi-cloud-arrow-up-fill" style="font-size: 4.5rem;"></i>
+        <h3 class="fw-bold mt-2">Lepaskan File di Sini</h3>
+        <p class="mb-0">File akan otomatis dimasukkan ke formulir upload dokumen {{ $user->name }}</p>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-12">
         <div class="card border-0 shadow-sm bg-body-tertiary">
@@ -52,6 +62,7 @@
     </div>
 </div>
 
+<!-- Modal Upload Dokumen -->
 <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
@@ -65,6 +76,11 @@
             <form action="{{ route('admin.documents.store_for_user', $user->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body p-4 space-y-3">
+                    <div class="alert alert-info py-2 px-3 small mb-3 border-0" style="background-color: rgba(2, 136, 209, 0.1); color: #0277bd;">
+                        <i class="bi bi-info-circle-fill me-1"></i>
+                        Folder bulan ditentukan otomatis oleh sistem berdasarkan <strong>Tanggal Izin</strong> (Data Dukung) atau <strong>Tanggal Cut-off</strong> (Rekap Presensi).
+                    </div>
+
                     <div class="mb-3">
                         <label for="kategori" class="form-label fw-bold text-gray-700 dark:text-gray-200 text-sm">Kategori Dokumen</label>
                         <select name="kategori" id="kategori" class="form-select bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 fw-bold" onchange="toggleAdminTanggal(this.value)" required>
@@ -93,7 +109,10 @@
 
                     <div class="mb-3">
                         <label for="lampiran" class="form-label fw-bold text-gray-700 dark:text-gray-200 text-sm">File Lampiran (PDF / Gambar)</label>
-                        <input type="file" name="lampiran[]" id="lampiran" multiple class="form-control bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 fw-bold" required>
+                        <input type="file" name="lampiran[]" id="lampiran" accept=".pdf,.jpg,.jpeg,.png" multiple class="form-control bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 fw-bold" required>
+                        <div id="droppedFileBadge" class="mt-2 d-none">
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> <span id="droppedFileCount">0</span> file siap di-upload</span>
+                        </div>
                     </div>
                 </div>
 
