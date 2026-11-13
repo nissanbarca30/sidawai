@@ -5,6 +5,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentPublicController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -90,6 +91,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/documents/store-for-user/{userId}', [AdminController::class, 'storeDocumentForUser'])->name('documents.store_for_user');
 
         Route::post('/toggle-register', [AdminController::class, 'toggleRegisterStatus'])->name('toggle_register');
+
+        Route::post('/setting/toggle-forgot-password', [App\Http\Controllers\Admin\AdminController::class, 'toggleForgotPasswordStatus'])->name('toggle_forgot_password');
+        Route::post('/settings/toggle/{key}', [SettingController::class, 'toggle'])->name('settings.toggle');
 
         // 3. ROUTE KHUSUS SUPERADMIN (Akses Tertinggi)
         Route::middleware(['superadmin'])->group(function () {

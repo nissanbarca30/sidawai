@@ -1,19 +1,66 @@
-function updateClock() {
-    const now = new Date();
+document.addEventListener('DOMContentLoaded', function () {
+    const chartContainer = document.getElementById('dashboard-charts-data');
+    if (!chartContainer) return;
 
-    const options = {
-        timeZone: 'Asia/Jakarta',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    };
+    // Ambil & parse data dari atribut HTML data-*
+    const months = JSON.parse(chartContainer.dataset.months || '[]');
+    const monthlyData = JSON.parse(chartContainer.dataset.monthlyStats || '[]');
+    const dataDukung = parseInt(chartContainer.dataset.dataDukung || 0);
+    const rekapPresensi = parseInt(chartContainer.dataset.rekapPresensi || 0);
 
-    const formatter = new Intl.DateTimeFormat('en-GB', options);
-    const timeString = formatter.format(now);
+    // 1. Render Bar Chart (Statistik Bulanan)
+    const monthlyCanvas = document.getElementById('monthlyChart');
+    if (monthlyCanvas) {
+        new Chart(monthlyCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Jumlah Dokumen',
+                    data: monthlyData,
+                    backgroundColor: '#40BF89',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
+            }
+        });
+    }
 
-    document.getElementById('clock').textContent = timeString + " WIB";
-}
-
-setInterval(updateClock, 1000);
-updateClock();
+    // 2. Render Donut Chart (Kategori Dokumen)
+    const categoryCanvas = document.getElementById('categoryChart');
+    if (categoryCanvas) {
+        new Chart(categoryCanvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Data Dukung', 'Rekap Presensi'],
+                datasets: [{
+                    data: [dataDukung, rekapPresensi],
+                    backgroundColor: ['#40BF89', '#0288D1'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                cutout: '70%'
+            }
+        });
+    }
+});

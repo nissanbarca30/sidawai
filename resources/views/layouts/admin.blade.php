@@ -6,11 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Panel - SIDAWAI BKK Pontianak</title>
-
-    <!-- Bootstrap 5 & Bootstrap Icons -->
+    <link rel="icon" type="image/png" href="{{ asset('assets/logo/logo kemenkes.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
     <script>
         (function() {
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -64,7 +62,7 @@
                             </li>
                         @endif
 
-                        <!-- 4. Dokumen Pegawai -->
+                        <!-- Dokumen Pegawai -->
                         @if (auth()->user()->hasPermission('manage_documents'))
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('admin.documents.*') ? 'active' : '' }}" href="{{ route('admin.documents.index') }}">
@@ -72,6 +70,48 @@
                                 </a>
                             </li>
                         @endif
+
+                        <!-- PENGATURAN -->
+                        @if (auth()->user()->isSuperadmin())
+                            @php
+                                $allowRegister = \App\Models\Setting::get('allow_register', '1') == '1';
+                                $allowForgotPassword = \App\Models\Setting::get('allow_forgot_password', '1') == '1';
+                            @endphp
+                            <li class="nav-item">
+                                <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#settingsSubmenu" role="button" aria-expanded="false" aria-controls="settingsSubmenu">
+                                    <span><i class="bi bi-gear me-2"></i> Pengaturan </span>
+                                    <i class="bi bi-chevron-down small"></i>
+                                </a>
+                                <div class="collapse ps-3 pe-2 py-2 bg-black bg-opacity-10 rounded-2 my-1" id="settingsSubmenu">
+                                    <!-- Toggle Register -->
+                                    <form action="{{ route('admin.settings.toggle', 'allow_register') }}" method="POST" class="mb-2">
+                                        @csrf
+                                        <div class="d-flex justify-content-between align-items-center text-white-50 small">
+                                            <span class="text-truncate" style="max-width: 110px;">
+                                                <i class="bi bi-person-plus me-1"></i> Register
+                                            </span>
+                                            <button type="submit" class="btn btn-xs {{ $allowRegister ? 'btn-success' : 'btn-secondary' }}" style="font-size: 0.7rem; padding: 2px 8px;">
+                                                {{ $allowRegister ? 'Tampil' : 'Sembunyi' }}
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                    <!-- Toggle Lupa Password -->
+                                    <form action="{{ route('admin.settings.toggle', 'allow_forgot_password') }}" method="POST">
+                                        @csrf
+                                        <div class="d-flex justify-content-between align-items-center text-white-50 small">
+                                            <span class="text-truncate" style="max-width: 110px;">
+                                                <i class="bi bi-key me-1"></i> Lupa Pass
+                                            </span>
+                                            <button type="submit" class="btn btn-xs {{ $allowForgotPassword ? 'btn-success' : 'btn-secondary' }}" style="font-size: 0.7rem; padding: 2px 8px;">
+                                                {{ $allowForgotPassword ? 'Tampil' : 'Sembunyi' }}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </li>
+                        @endif
+
                     @endif
                 </ul>
             </div>

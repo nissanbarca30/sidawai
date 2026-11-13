@@ -3,21 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>{{ config('app.name', 'SIDAWAI') }}</title>
-
-    <!-- Fonts -->
+    <link rel="icon" type="image/png" href="{{ asset('assets/logo/logo kemenkes.png') }}">
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
 
-    <!-- Scripts (Vite & Local Assets) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="{{ asset('aset/css/getboot.min.css') }}" rel="stylesheet">
-
-    <!-- Tailwind CSS CDN dengan konfigurasi Dark Mode class -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -63,7 +56,7 @@
                         </div>
                     </a>
 
-                    <!-- Tombol Darkmode & Auth Profil -->
+                    <!-- Darkmode & Auth Profil -->
                     <div class="flex items-center space-x-3 sm:space-x-4 shrink-0">
 
                         <button 
@@ -163,7 +156,7 @@
                     </p>
                     <p class="text-gray-400 dark:text-gray-400 font-semibold text-xs sm:text-sm m-0">
                         Sistem Dokumentasi dan Arsip Pegawai - Developed by 
-                        <a href="https://instagram.com/nissan.gianda" target="_blank" rel="noopener noreferrer" class="text-[#40BF89] hover:text-[#32996e] dark:text-[#40BF89] dark:hover:text-[#52d69e] underline font-bold transition-colors">
+                        <a href="https://www.linkedin.com/in/nafil-issan-barcagianda-b51172443?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener noreferrer" class="text-[#40BF89] hover:text-[#32996e] dark:text-[#40BF89] dark:hover:text-[#52d69e] underline font-bold transition-colors">
                             Nafil
                         </a>
                     </p>

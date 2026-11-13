@@ -34,27 +34,10 @@
                 </label>
 
                 <div class="relative">
-                    <input 
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Masukkan password"
-                        required
-                        class="w-full bg-[#f0f0f0] dark:bg-[#161a1e] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 pr-12 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#40BF89] dark:focus:bg-[#161a1e] transition-colors"
-                    >
+                    <input type="password" id="password" name="password" placeholder="Masukkan password" required class="w-full bg-[#f0f0f0] dark:bg-[#161a1e] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 pr-12 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#40BF89] dark:focus:bg-[#161a1e] transition-colors">
 
-                    <button
-                        type="button"
-                        id="togglePassword"
-                        class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 dark:text-gray-400 hover:text-[#40BF89] dark:hover:text-[#40BF89] transition"
-                        aria-label="Tampilkan password"
-                    >
-                        <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg"
-                            class="w-5 h-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            stroke-width="2">
+                    <button type="button" id="togglePassword" aria-label="Tampilkan password" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none">
+                        <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M3 3l18 18M10.58 10.58a2 2 0 102.83 2.83M9.88 4.24A9.77 9.77 0 0112 4c5 0 9.27 3.11 10.5 8a10.05 10.05 0 01-4.13 5.74M6.23 6.23A10.05 10.05 0 003.5 12c.61 2.39 2.02 4.36 3.87 5.74A9.77 9.77 0 0012 20c1.61 0 3.13-.38 4.5-1.06" />
                         </svg>
@@ -75,17 +58,24 @@
             </div>
 
             <div class="flex items-center justify-between pt-2">
+                @php
+                    $allowForgotPassword = \App\Models\Setting::get('allow_forgot_password', '1') == '1';
+                @endphp
 
-                @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}"
-                        class="text-black dark:text-gray-300 font-extrabold text-sm hover:underline no-underline">
-                        Lupa Password?
-                    </a>
+                @if ($allowForgotPassword)
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}"
+                            class="text-black dark:text-gray-300 font-extrabold text-sm hover:underline no-underline">
+                            Lupa Password?
+                        </a>
+                    @else
+                        <a href="#"
+                            class="text-black dark:text-gray-300 font-extrabold text-sm hover:underline no-underline">
+                            Lupa Password?
+                        </a>
+                    @endif
                 @else
-                    <a href="#"
-                        class="text-black dark:text-gray-300 font-extrabold text-sm hover:underline no-underline">
-                        Lupa Password?
-                    </a>
+                    <div></div>
                 @endif
 
                 <button 

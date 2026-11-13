@@ -31,14 +31,55 @@ class AdminController extends Controller
 
     public function index()
     {
-        $totalPegawai = User::count(); // termasuk admin
+        $totalPegawai = User::count();
         $totalDokumen = Document::count();
         $users = User::withCount('documents')->latest()->get();
 
-        // 1 = pendaftaran terbuka, 0 = terkunci
+        // Status Setting (1 = Tampil/Terbuka, 0 = Tersembunyi/Terkunci)
         $allowRegister = Setting::get('allow_register', '1') == '1';
+        $allowForgotPassword = Setting::get('allow_forgot_password', '1') == '1';
 
-        return view('admin.dashboard', compact('totalPegawai', 'totalDokumen', 'users', 'allowRegister'));
+        // Data statistik grafik...
+        $currentYear = \Carbon\Carbon::now()->year;
+        $monthlyStats = [];
+        $namaBulan = [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+
+        foreach ($namaBulan as $bulan) {
+            $monthlyStats[] = Document::where('tahun_periode', $currentYear)
+                ->where('bulan_periode', $bulan)
+                ->count();
+        }
+
+        $totalDataDukung = Document::where('kategori', 'data_dukung')->count();
+        $totalRekapPresensi = Document::where('kategori', 'rekap_presensi')->count();
+
+        return view('admin.dashboard', compact(
+            'totalPegawai', 
+            'totalDokumen', 
+            'users', 
+            'allowRegister',
+            'allowForgotPassword',
+            'namaBulan',
+            'monthlyStats',
+            'totalDataDukung',
+            'totalRekapPresensi',
+            'currentYear'
+        ));
+    }
+
+    public function toggleForgotPasswordStatus()
+    {
+        $newStatus = Setting::get('allow_forgot_password', '1') == '1' ? '0' : '1';
+        Setting::set('allow_forgot_password', $newStatus);
+
+        $pesan = $newStatus == '1'
+            ? 'Fitur Lupa Password berhasil DIBUKA.'
+            : 'Fitur Lupa Password berhasil DIKUNCI/DISEMBUNYIKAN.';
+
+        return back()->with('success', $pesan);
     }
 
     // =========================================================================
